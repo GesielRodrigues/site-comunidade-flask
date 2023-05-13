@@ -1,4 +1,4 @@
-from main import app, database
+from comunidadeflask import app, database
 
 
 with app.app_context():
