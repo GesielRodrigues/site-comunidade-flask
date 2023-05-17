@@ -1,5 +1,5 @@
 from comunidadeflask import app, bcrypt, database
-from comunidadeflask.forms import FormCriarConta, FormLogin
+from comunidadeflask.forms import FormCriarConta, FormLogin, FormEditarPerfil
 from comunidadeflask.models import Usuario
 from flask import flash, redirect, request, render_template, url_for
 from flask_login import current_user, login_user, logout_user, login_required
@@ -64,7 +64,16 @@ def sair():
 @app.route('/perfil')
 @login_required
 def perfil():
-    return render_template('perfil.html')
+    foto_perfil = url_for('static', filename='fotos_perfil/{}'.format(current_user.foto_perfil))
+    return render_template('perfil.html', foto_perfil=foto_perfil)
+
+
+@app.route('/perfil/editar', methods=['GET', 'POST'])
+@login_required
+def editarperfil():
+    form_editar_perfil = FormEditarPerfil()
+    foto_perfil = url_for('static', filename='fotos_perfil/{}'.format(current_user.foto_perfil))
+    return render_template('editarperfil.html', foto_perfil=foto_perfil, form_editar_perfil=form_editar_perfil)
 
 
 @app.route('/post/criar')
