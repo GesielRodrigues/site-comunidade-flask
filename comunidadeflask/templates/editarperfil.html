@@ -6,7 +6,7 @@
     <hr>
     <div class="row">
         <div class="col">
-            <form method="POST" action="" class="border p-4 mt-2">
+            <form method="POST" action="" class="border p-4 mt-2" enctype="multipart/form-data">
                 {{ form_editar_perfil.csrf_token }}
                 <legend>Editar Perfil</legend>
                 <fieldset>
@@ -34,6 +34,16 @@
                         </div>
                         {% else %}
                         {{ form_editar_perfil.email(class="form-control") }}
+                        {% endif %}
+                    </div>
+                    <div class="form-grouo">
+                        {{ form_editar_perfil.foto_perfil.label }}
+                        <br>
+                        {{ form_editar_perfil.foto_perfil(class="form-control-file") }}
+                        {% if form_editar_perfil.foto_perfil.errors %}
+                            {% for erro in form_editar_perfil.foto_perfil.errors %}
+                                <span class="text-danger">{{ erro }}</span><br>
+                            {% endfor %}
                         {% endif %}
                     </div>
                 </fieldset>

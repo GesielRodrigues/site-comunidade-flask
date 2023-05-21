@@ -1,8 +1,11 @@
+import os
+import secrets
 from comunidadeflask import app, bcrypt, database
 from comunidadeflask.forms import FormCriarConta, FormLogin, FormEditarPerfil
 from comunidadeflask.models import Usuario
 from flask import flash, redirect, request, render_template, url_for
 from flask_login import current_user, login_user, logout_user, login_required
+from PIL import Image
 
 lista_usuarios = ['Gesiel', 'Ariadne', 'Luna']
 
@@ -68,10 +71,43 @@ def perfil():
     return render_template('perfil.html', foto_perfil=foto_perfil)
 
 
+def salvar_foto_perfil(imagem):
+    # Gerando código único para foto
+    codigo = secrets.token_hex(8)
+    nome, extensao = os.path.splitext(imagem.filename)
+    nome_arquivo = nome + codigo + extensao
+
+    # Caminho onde a imagem vai ser salva
+    caminho_completo = os.path.join(
+        app.root_path, 'static/fotos_perfil', nome_arquivo
+    )
+
+    # Diminuir foto para salvar
+    tamanho_foto = (400, 400)
+    foto_reduzida = Image.open(imagem)
+    foto_reduzida.thumbnail(tamanho_foto)
+
+    # Salvar foto
+    foto_reduzida.save(caminho_completo)
+    return nome_arquivo
+
+
 @app.route('/perfil/editar', methods=['GET', 'POST'])
 @login_required
 def editarperfil():
     form_editar_perfil = FormEditarPerfil()
+    if form_editar_perfil.validate_on_submit():
+        current_user.email = form_editar_perfil.email.data
+        current_user.username = form_editar_perfil.username.data
+        if form_editar_perfil.foto_perfil.data:
+            nome_foto = salvar_foto_perfil(form_editar_perfil.foto_perfil.data)
+            current_user.foto_perfil = nome_foto
+        database.session.commit()
+        flash('Perfil atualizado com Sucesso', 'alert-success')
+        return redirect(url_for('perfil'))
+    elif request.method == "GET":
+        form_editar_perfil.email.data = current_user.email
+        form_editar_perfil.username.data = current_user.username
     foto_perfil = url_for('static', filename='fotos_perfil/{}'.format(current_user.foto_perfil))
     return render_template('editarperfil.html', foto_perfil=foto_perfil, form_editar_perfil=form_editar_perfil)
 
