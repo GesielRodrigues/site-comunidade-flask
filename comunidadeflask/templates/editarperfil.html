@@ -46,6 +46,16 @@
                             {% endfor %}
                         {% endif %}
                     </div>
+                      <hr>
+                        <p>Conhecimentos:</p>
+                        {% for campo in form_editar_perfil %}
+                            {% if 'conhecimento_' in campo.name %}
+                                <div class="form-group">
+                                    {{ campo(class="form-check-input") }}
+                                    {{ campo.label(class="form-check-label") }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
                 </fieldset>
                 {{ form_editar_perfil.botao_submit_editar(class="btn btn-primary mt-2") }}
             </form>
