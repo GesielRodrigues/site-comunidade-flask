@@ -36,3 +36,13 @@
 .number3 {
     font-weight: 500
 }
+
+.post-it {
+   background: #FFF7DC !important;
+}
+
+
+.link-post {
+    text-decoration: none;
+    color: #53666c;
+}

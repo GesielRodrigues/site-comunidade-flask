@@ -1,18 +1,17 @@
 import os
 import secrets
 from comunidadeflask import app, bcrypt, database
-from comunidadeflask.forms import FormCriarConta, FormLogin, FormEditarPerfil
-from comunidadeflask.models import Usuario
+from comunidadeflask.forms import FormCriarConta, FormPost, FormEditarPerfil, FormLogin
+from comunidadeflask.models import Post, Usuario
 from flask import flash, redirect, request, render_template, url_for
 from flask_login import current_user, login_user, logout_user, login_required
 from PIL import Image
 
-lista_usuarios = ['Gesiel', 'Ariadne', 'Luna']
-
 
 @app.route("/")
 def home():
-    return render_template('home.html')
+    posts = Post.query.order_by(Post.id.desc())  # .all()
+    return render_template('home.html', posts=posts)
 
 
 @app.route("/contato")
@@ -23,6 +22,7 @@ def contato():
 @app.route("/usuarios")
 @login_required
 def usuarios():
+    lista_usuarios = Usuario.query.all()
     return render_template('usuarios.html', lista_usuarios=lista_usuarios)
 
 
@@ -122,7 +122,34 @@ def editarperfil():
     return render_template('editarperfil.html', foto_perfil=foto_perfil, form_editar_perfil=form_editar_perfil)
 
 
-@app.route('/post/criar')
+@app.route('/post/criar', methods=['GET', 'POST'])
 @login_required
 def criar_post():
-    return render_template('criarpost.html')
+    form_criar_post = FormPost()
+    if form_criar_post.validate_on_submit():
+        post = Post(titulo=form_criar_post.titulo.data, corpo=form_criar_post.corpo.data, autor=current_user)
+        database.session.add(post)
+        database.session.commit()
+        flash('Post Criado com Sucesso', 'alert-success')
+        return redirect(url_for('home'))
+    return render_template('criarpost.html', form_criar_post=form_criar_post)
+
+
+@app.route('/post/<post_id>', methods=['GET', 'POST'])
+@login_required
+def exibir_post(post_id):
+    post = Post.query.get(post_id)
+    if current_user == post.autor:
+        form_editar_post = FormPost()
+        if request.method == 'GET':
+            form_editar_post.titulo.data = post.titulo
+            form_editar_post.corpo.data = post.corpo
+        elif form_editar_post.validate_on_submit():
+            post.titulo = form_editar_post.titulo.data
+            post.corpo = form_editar_post.corpo.data
+            database.session.commit()
+            flash('Post Atualizado com Sucesso', 'alert-success')
+            return redirect(url_for('home'))
+    else:
+        form_editar_post = None
+    return render_template('post.html', post=post, form_editar_post=form_editar_post)

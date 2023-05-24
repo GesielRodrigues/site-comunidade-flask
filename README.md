@@ -1,6 +1,9 @@
 # Comunidade Flask Post It
 
 
-Pequeno projeto em Flask.
+Projeto de utilizando Flask e Bootstrap 5.0.2.
 
-Mural de postagens com cadastro de usuarios. 
+Site com um mural de postagens.
+- Controle de cadastro de usuarios.
+- Usuários com informações das habilidades que domina.
+- Criação, edição e exclusão de posts.

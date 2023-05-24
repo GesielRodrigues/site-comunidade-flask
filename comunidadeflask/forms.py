@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
-from wtforms import BooleanField, StringField, PasswordField, SubmitField
+from wtforms import BooleanField, StringField, PasswordField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from comunidadeflask.models import Usuario
 
@@ -38,3 +38,9 @@ class FormEditarPerfil(FlaskForm):
     conhecimento_ml = BooleanField('Machine Learning')
 
     botao_submit_editar = SubmitField('Salvar')
+
+
+class FormPost(FlaskForm):
+    titulo = StringField('Título do Post', validators=[DataRequired(), Length(2, 140)])
+    corpo = TextAreaField('Escreva seu Post Aqui', validators=[DataRequired()])
+    botao_submit_criarpost = SubmitField('Confirmar Post')
