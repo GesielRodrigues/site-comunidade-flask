@@ -3,7 +3,7 @@ import secrets
 from comunidadeflask import app, bcrypt, database
 from comunidadeflask.forms import FormCriarConta, FormPost, FormEditarPerfil, FormLogin
 from comunidadeflask.models import Post, Usuario
-from flask import flash, redirect, request, render_template, url_for
+from flask import abort, flash, redirect, request, render_template, url_for
 from flask_login import current_user, login_user, logout_user, login_required
 from PIL import Image
 
@@ -153,3 +153,16 @@ def exibir_post(post_id):
     else:
         form_editar_post = None
     return render_template('post.html', post=post, form_editar_post=form_editar_post)
+
+
+@app.route('/post/<post_id>/excluir', methods=['GET', 'POST'])
+@login_required
+def excluir_post(post_id):
+    post = Post.query.get(post_id)
+    if current_user == post.autor:
+        database.session.delete(post)
+        database.session.commit()
+        flash('Post excluído com sucesso', 'alert-danger')
+        return redirect(url_for('home'))
+    else:
+        abort(403)
